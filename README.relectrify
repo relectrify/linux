@@ -1,0 +1,30 @@
+To build BBAI64 kernel:
+
+# to build the BBAI64 kernel and stack controller devicetree
+make ARCH=arm64 CROSS_COMPILE=aarch64-linux-musl- bbai64_sc_defconfig
+make ARCH=arm64 CROSS_COMPILE=aarch64-linux-musl- -j8
+
+# copy it to the target
+scp arch/arm64/boot/Image debian@bbai64:/tmp
+scp arch/arm64/boot/dts/ti/k3-j721e-beagleboneai64-sc.dtb debian@bbai64:/tmp
+# on the target
+sudo mv /tmp/Image /boot/firmware
+sudo mv /tmp/k3-j721e-beagleboneai64-sc.dtb /boot/firmware
+
+# while we're hacking on the debian image, make sure that extlinux.conf is
+# configured with the correct kernel image and devicetree
+vim /boot/firmware/extlinux/extlinux.conf
+
+# if you want to edit the kernel config
+make ARCH=arm64 CROSS_COMPILE=aarch64-linux-musl- menuconfig
+make ARCH=arm64 CROSS_COMPILE=aarch64-linux-musl- savedefconfig
+cp defconfig arch/arm64/configs/bbai64_sc_defconfig
+
+# if you want to change the devicetree
+vim arch/arm64/boot/dts/ti/k3-j721e-beagleboneai64-sc.dts
+
+# to update linux branches
+git remote add linux https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+git remote add linux-rt https://git.kernel.org/pub/scm/linux/kernel/git/rt/linux-rt-devel.git
+git fetch linux
+git fetch linux-rt
