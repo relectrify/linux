@@ -81,7 +81,7 @@
 	((((reg) << 1) | ((id) << 6) | (0 << 0)) & 0xff)
 #define MCP3914_REG_MASK GENMASK(4, 1)
 
-#define MCP3914_NUM_CHANNELS 2
+#define MCP3914_NUM_CHANNELS 8
 #define MCP3914_NUM_SCALES 6
 
 static const int mcp3914_osr_table[] = {
@@ -381,9 +381,9 @@ static int mcp3914_calc_scale_table(struct mcp3914 *adc)
 	}
 
 static const struct iio_chan_spec mcp3914_channels[] = {
-	MCP3914_CHAN(0),
-	MCP3914_CHAN(1),
-	IIO_CHAN_SOFT_TIMESTAMP(2),
+	MCP3914_CHAN(0), MCP3914_CHAN(1), MCP3914_CHAN(2),
+	MCP3914_CHAN(3), MCP3914_CHAN(4), MCP3914_CHAN(5),
+	MCP3914_CHAN(6), MCP3914_CHAN(7), IIO_CHAN_SOFT_TIMESTAMP(8),
 };
 
 static irqreturn_t mcp3914_trigger_handler(int irq, void *p)
