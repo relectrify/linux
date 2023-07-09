@@ -473,7 +473,7 @@ static int mcp3914_config(struct mcp3914 *adc)
 		return ret;
 
 	regval |= MCP3914_STATUSCOM_EN_CRCCOM; // Enable CRC
-	regval &= ~MCP3914_STATUSCOM_WIDTH_CRC; // 16bit with rounding
+	regval &= ~MCP3914_STATUSCOM_WIDTH_DATA; // 16bit with rounding
 
 	return mcp3914_write(adc, MCP3914_REG_STATUSCOM, regval, 3);
 }
