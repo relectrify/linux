@@ -1,5 +1,9 @@
 #include "k3-j721e-beagleboneai64.dts"
 
+// Device id
+// https://software-dl.ti.com/tisci/esd/latest/5_soc_doc/j721e/devices.html
+// https://e2e.ti.com/support/processors-group/processors/f/processors-forum/947437/faq-ccs-tda4vm-how-to-use-spi-spi_dev-on-tda4-j721e
+
 &main_pmx0 {
 	main_uart1_pins_default: main-uart1-pins-default {
 		pinctrl-single,pins = <
@@ -25,29 +29,13 @@
 		>;
 	};
 
-	spi1_pins_default: spi1-pins-default {
-		pinctrl-single,pins = <
-			J721E_IOPAD(0x1DC, PIN_OUTPUT, 0) /* (Y1) SPI1_CLK */
-			J721E_IOPAD(0x1D4, PIN_OUTPUT, 0) /* (Y3) SPI1_CS0 */
-			J721E_IOPAD(0x1E4, PIN_OUTPUT, 0) /* (Y2) SPI1_D1 */
-			J721E_IOPAD(0x1E0, PIN_INPUT, 0) /* (Y5) SPI1_D0 */
-			J721E_IOPAD(0x0B8, PIN_INPUT, 7) /* (AE27) GPIO0_45 */
-		>;
-	};
-
-	epwm_pins_default: epwm-pins-default {
-		pinctrl-single,pins = <
-			J721E_IOPAD(0x178, PIN_OUTPUT, 6) /* (U27) EHRPWM2_A */
-			J721E_IOPAD(0x17C, PIN_OUTPUT, 6) /* (U24) EHRPWM2_B */
-		>;
-	};
-
 	mcan6_pins_default: mcan6-pins-default {
 		pinctrl-single,pins = <
 			J721E_IOPAD(0x040, PIN_OUTPUT_PULLUP, 6) /* (AC24) MCAN7_TX */
 			J721E_IOPAD(0x044, PIN_INPUT_PULLUP, 6) /* (AE24) MCAN7_RX */
 		>;		
 	};
+
 	mcan7_pins_default: mcan7-pins-default {
 		pinctrl-single,pins = <
 			J721E_IOPAD(0x088, PIN_OUTPUT_PULLUP, 6) /* (AH25) MCAN7_TX */
@@ -55,25 +43,70 @@
 		>;		
 	};
 
-};
-
-// Device id
-// https://software-dl.ti.com/tisci/esd/latest/5_soc_doc/j721e/devices.html
-
-// https://e2e.ti.com/support/processors-group/processors/f/processors-forum/947437/faq-ccs-tda4vm-how-to-use-spi-spi_dev-on-tda4-j721e
-&cbass_main {
-	main_spi1: spi@2110000 {
-		compatible = "ti,am654-mcspi","ti,omap4-mcspi";
-		reg = <0x0 0x2110000 0x0 0x400>;
-		interrupts = <GIC_SPI 185 IRQ_TYPE_LEVEL_HIGH>; // GIC500_SPI_IN_217 - 32
-		clocks = <&k3_clks 267 1>;
-		power-domains = <&k3_pds 267 TI_SCI_PD_EXCLUSIVE>;
-		#address-cells = <1>;
-		#size-cells = <0>;
-		dma-names = "tx0", "rx0";
-		dmas = <&main_udmap 0xC604>, <&main_udmap 0x4604>;
+	spi6_pins_default: spi6-pins-default {
+		pinctrl-single,pins = <
+			J721E_IOPAD(0x09C, PIN_OUTPUT, 4) /* (AC22) SPI6_CLK bootmode1*/
+			J721E_IOPAD(0x074, PIN_OUTPUT, 4) /* (AC21) SPI6_CS0 */
+			J721E_IOPAD(0x0A4, PIN_INPUT, 4) /* (AH22) SPI6_D1 */
+			J721E_IOPAD(0x0A0, PIN_OUTPUT, 4) /* (AJ22) SPI6_D0 */
+			J721E_IOPAD(0x0C4, PIN_INPUT, 7) /* (AC29) GPIO0_48 IRQ*/
+		>;
 	};
 
+	spi7_pins_default: spi7-pins-default {
+		pinctrl-single,pins = <
+			J721E_IOPAD(0x234, PIN_OUTPUT, 6) /* (U3) SPI7_CLK */
+			J721E_IOPAD(0x230, PIN_OUTPUT, 6) /* (U2) SPI7_CS0 */
+			J721E_IOPAD(0x23C, PIN_INPUT, 6) /* (V5) SPI7_D1 */
+			J721E_IOPAD(0x238, PIN_OUTPUT, 6) /* (V6) SPI7_D0 BOOTMODE4*/
+			J721E_IOPAD(0x014, PIN_INPUT, 7) /* (AH23) GPIO0_5 IRQ*/
+
+		>;
+	};
+
+	epwm_pins_default: epwm-pins-default {
+		pinctrl-single,pins = <
+			J721E_IOPAD(0x164, PIN_OUTPUT, 6) /* (V29) EHRPWM0_A */
+			J721E_IOPAD(0x168, PIN_OUTPUT, 6) /* (V27) EHRPWM0_B */
+		>;
+	};
+
+	relay_pins_default: relay-pins-default {
+		pinctrl-single,pins = <
+			J721E_IOPAD(0x064, PIN_OUTPUT, 7) /* (AD23) GPIO0_24 LOAD_RELAY*/
+			J721E_IOPAD(0x1AC, PIN_OUTPUT, 7) /* (Y27) GPIO0_106 SPARE_RELAY*/
+			J721E_IOPAD(0x118, PIN_OUTPUT, 7) /* (AC26) GPIO0_69 GEN_RELAY*/
+			J721E_IOPAD(0x110, PIN_OUTPUT, 7) /* (AD29) GPIO0_67 GRID_RELAY*/
+		>;		
+	};
+
+	adc_rst_pins_default: adc-rst-pins-default {
+		pinctrl-single,pins = <
+			J721E_IOPAD(0x038, PIN_OUTPUT_PULLUP, 7) /* (AG24) GPIO0_14 ADC_RST*/
+			J721E_IOPAD(0x0D0, PIN_OUTPUT_PULLUP, 7) /* (Y1) GPIO0_51 ADC_RST */
+		>;		
+	};
+	
+	drm_pins_default: adc-rst-pins-default {
+		pinctrl-single,pins = <
+			J721E_IOPAD(0x020, PIN_INPUT, 7) /* (AE20) GPIO0_8 DRM_1_5*/
+			J721E_IOPAD(0x1A8, PIN_INPUT, 7) /* (Y29) GPIO0_105 DRM_2_6*/
+			J721E_IOPAD(0x11C, PIN_INPUT, 7) /* (AA24) GPIO0_70 DRM_3_7*/
+			J721E_IOPAD(0x114, PIN_INPUT, 7) /* (AB27) GPIO0_68 DRM_4_8*/
+			J721E_IOPAD(0x10C, PIN_INPUT, 7) /* (AC25) GPIO0_66 DRM_0*/
+			J721E_IOPAD(0x144, PIN_OUTPUT, 7) /* (Y25) GPIO0_80 DRM_STROBE*/
+		>;		
+	};
+
+};
+
+&main_gpio0 {
+	pinctrl-0 = <&relay_pins_default>;
+	pinctrl-0 = <&adc_rst_pins_default>;
+	pinctrl-0 = <&drm_pins_default>;
+};
+
+&cbass_main {
 	main_spi6: spi@2160000 {
 		compatible = "ti,am654-mcspi","ti,omap4-mcspi";
 		reg = <0x0 0x2160000 0x0 0x400>;
@@ -98,6 +131,10 @@
 		dmas = <&main_udmap 0xC628>, <&main_udmap 0x4628>;
 	};
 
+};
+
+&main_i2c4 {
+	status = "disabled";
 };
 
 &main_i2c6 {
@@ -131,23 +168,41 @@
 	dmas = <&main_udmap 0xC708>, <&main_udmap 0x4708>;
 };
 
-&main_spi1 {
+&main_spi6 {
 	status = "okay";
 	pinctrl-names = "default";
-	pinctrl-0 = <&spi1_pins_default>;
+	pinctrl-0 = <&spi6_pins_default>;
+	ti,pindir-d0-out-d1-in;
 
 	adc0@0 {
 		spi-max-frequency = <10000000>;
 		reg = <0>;
-		compatible = "microchip,mcp3911";
+		compatible = "microchip,mcp3914";
 		clocks = <&cmn_refclk>;
 		microchip,device-addr = <1>;
 		interrupt-parent = <&main_gpio0>;
-		interrupts = <45 2>; // GPIOMUX_INTRTR0_IN_258
+		interrupts = <48 2>;
 	};
 };
 
-&main_ehrpwm2 {
+&main_spi7 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&spi7_pins_default>;
+	ti,pindir-d0-out-d1-in;
+
+	adc0@0 {
+		spi-max-frequency = <10000000>;
+		reg = <0>;
+		compatible = "microchip,mcp3914";
+		clocks = <&cmn_refclk>;
+		microchip,device-addr = <1>;
+		interrupt-parent = <&main_gpio0>;
+		interrupts = <5 2>;
+	};
+};
+
+&main_ehrpwm0 {
 	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&epwm_pins_default>;
