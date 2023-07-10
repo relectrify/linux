@@ -60,7 +60,6 @@
 			J721E_IOPAD(0x23C, PIN_INPUT, 6) /* (V5) SPI7_D1 */
 			J721E_IOPAD(0x238, PIN_OUTPUT, 6) /* (V6) SPI7_D0 BOOTMODE4*/
 			J721E_IOPAD(0x014, PIN_INPUT, 7) /* (AH23) GPIO0_5 IRQ*/
-
 		>;
 	};
 
@@ -87,7 +86,7 @@
 		>;		
 	};
 	
-	drm_pins_default: adc-rst-pins-default {
+	drm_pins_default: drm-pins-default {
 		pinctrl-single,pins = <
 			J721E_IOPAD(0x020, PIN_INPUT, 7) /* (AE20) GPIO0_8 DRM_1_5*/
 			J721E_IOPAD(0x1A8, PIN_INPUT, 7) /* (Y29) GPIO0_105 DRM_2_6*/
@@ -100,10 +99,12 @@
 
 };
 
-&main_gpio0 {
-	pinctrl-0 = <&relay_pins_default>;
-	pinctrl-0 = <&adc_rst_pins_default>;
-	pinctrl-0 = <&drm_pins_default>;
+/ {
+	gpios {
+		compatible = "dummy";
+		pinctrl-names = "gpios";
+		pinctrl-0 = <&relay_pins_default>, <&adc_rst_pins_default>, <&drm_pins_default>;
+	};
 };
 
 &cbass_main {
