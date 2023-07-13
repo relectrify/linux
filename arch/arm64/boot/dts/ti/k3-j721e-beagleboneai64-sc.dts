@@ -81,6 +81,7 @@
 
 	adc_rst_pins_default: adc-rst-pins-default {
 		pinctrl-single,pins = <
+			J721E_IOPAD(0x01C, PIN_OUTPUT_PULLDOWN, 7) /* (AD22) GPIO0_7 ADC_PWR_EN*/
 			J721E_IOPAD(0x038, PIN_OUTPUT_PULLUP, 7) /* (AG24) GPIO0_14 ADC_RST*/
 			J721E_IOPAD(0x0D0, PIN_OUTPUT_PULLUP, 7) /* (Y1) GPIO0_51 ADC_RST */
 		>;		
