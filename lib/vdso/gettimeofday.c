@@ -439,3 +439,68 @@ __cvdso_clock_getres_time32(clockid_t clock, struct old_timespec32 *res)
 }
 #endif /* BUILD_VDSO32 */
 #endif /* VDSO_HAS_CLOCK_GETRES */
+
+static __always_inline int do_getparam(const struct vdso_data *vd, clockid_t clk,
+				   struct __kernel_clockparam *res)
+{
+	const struct vdso_timestamp *vdso_ts = &vd->basetime[clk];
+	u32 seq;
+
+	do {
+		/*
+		 * Open coded to handle VDSO_CLOCK_TIMENS. See comment in
+		 * do_hres().
+		 */
+		while (unlikely((seq = READ_ONCE(vd->seq)) & 1)) {
+			if (IS_ENABLED(CONFIG_TIME_NS) &&
+			    vd->clock_mode == VDSO_CLOCKMODE_TIMENS)
+				return -1;
+			cpu_relax();
+		}
+		smp_rmb();
+
+		if (unlikely(!vdso_clocksource_ok(vd)))
+			return -1;
+
+		res->sec = vdso_ts->sec;
+		res->nsec = vdso_ts->nsec;
+		res->cycle_last = vd->cycle_last;
+		res->mask = vd->mask;
+		res->mult = vd->mult;
+		res->shift = vd->shift;
+	} while (unlikely(vdso_read_retry(vd, seq)));
+
+	return 0;
+}
+
+
+static __maybe_unused
+int __cvdso_clock_getparam_data(const struct vdso_data *vd, clockid_t clock,
+			      struct __kernel_clockparam *res)
+{
+	u32 msk;
+
+	/* Check for negative values or invalid clocks */
+	if (unlikely((u32) clock >= MAX_CLOCKS))
+		return -1;
+
+	/*
+	 * Convert the clockid to a bitmask and use it to check which
+	 * clocks are handled in the VDSO directly.
+	 */
+	msk = 1U << clock;
+	if (likely(msk & (VDSO_HRES | VDSO_COARSE)))
+		vd = &vd[CS_HRES_COARSE];
+	else if (msk & VDSO_RAW)
+		vd = &vd[CS_RAW];
+	else
+		return -1;
+
+	return do_getparam(vd, clock, res);
+}
+
+static __maybe_unused
+int __cvdso_clock_getparam(clockid_t clock, struct __kernel_clockparam *res)
+{
+	return __cvdso_clock_getparam_data(__arch_get_vdso_data(), clock, res);
+}

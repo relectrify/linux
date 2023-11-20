@@ -43,4 +43,13 @@ struct __kernel_sock_timeval {
 	__s64 tv_usec;
 };
 
+struct __kernel_clockparam {
+	u64 sec;
+	u64 nsec; /* note: shifted left by shift for HR clocks */
+	u64 cycle_last;
+	u64 mask;
+	u32 mult;
+	u32 shift;
+};
+
 #endif /* _UAPI_LINUX_TIME_TYPES_H */

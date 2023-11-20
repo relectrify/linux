@@ -23,3 +23,9 @@ int __kernel_clock_getres(clockid_t clock_id,
 {
 	return __cvdso_clock_getres(clock_id, res);
 }
+
+int __kernel_clock_getparam(clockid_t clock_id,
+			  struct __kernel_clockparam *res)
+{
+	return __cvdso_clock_getparam(clock_id, res);
+}
