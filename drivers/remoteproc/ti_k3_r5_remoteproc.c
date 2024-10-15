@@ -158,6 +158,7 @@ struct k3_r5_core {
 	u32 btcm_enable;
 	u32 loczrama;
 	bool released_from_reset;
+	bool disable_kick;
 };
 
 /**
@@ -315,6 +316,9 @@ static void k3_r5_rproc_kick(struct rproc *rproc, int vqid)
 	struct device *dev = rproc->dev.parent;
 	mbox_msg_t msg = (mbox_msg_t)vqid;
 	int ret;
+
+	if (kproc->core->disable_kick)
+		return;
 
 	/* send the index of the triggered virtqueue in the mailbox payload */
 	ret = mbox_send_message(kproc->mbox, (void *)msg);
@@ -1868,6 +1872,8 @@ static int k3_r5_core_of_init(struct platform_device *pdev)
 		dev_err(dev, "missing 'ti,sci-dev-id' property\n");
 		goto err;
 	}
+
+	core->disable_kick = of_find_property(np, "relectrify,disable-kick", NULL);
 
 	core->reset = devm_reset_control_get_exclusive(dev, NULL);
 	if (IS_ERR_OR_NULL(core->reset)) {
