@@ -4,6 +4,7 @@
  */
 
 #include <linux/clk-provider.h>
+#include <linux/clk.h>
 #include <linux/kernel.h>
 #include <linux/mfd/syscon.h>
 #include <linux/module.h>
@@ -24,8 +25,8 @@ struct ti_syscon_gate_clk_data {
 	u32 bit_idx;
 };
 
-static struct
-ti_syscon_gate_clk_priv *to_ti_syscon_gate_clk_priv(struct clk_hw *hw)
+static struct ti_syscon_gate_clk_priv *
+to_ti_syscon_gate_clk_priv(struct clk_hw *hw)
 {
 	return container_of(hw, struct ti_syscon_gate_clk_priv, hw);
 }
@@ -149,6 +150,26 @@ static int ti_syscon_gate_clk_probe(struct platform_device *pdev)
 		if (IS_ERR(hw_data->hws[i]))
 			dev_warn(dev, "failed to register %s\n",
 				 data[i].name);
+	}
+
+	/* relectrify: support enabling clocks for use by co-processors */
+	if (of_get_property(dev->of_node, "relectrify,enable", NULL)) {
+		u32 gate, i = 0;
+		while (!of_property_read_u32_index(dev->of_node,
+						   "relectrify,enable", i,
+						   &gate)) {
+			struct clk *clk;
+
+			++i;
+			if (gate >= num_clks) {
+				dev_warn(dev, "bad index %u\n", gate);
+				continue;
+			}
+			clk = devm_clk_hw_get_clk(dev, hw_data->hws[gate],
+						  "enabled");
+			clk_prepare(clk);
+			clk_enable(clk);
+		}
 	}
 
 	if (num_clks == 1)
